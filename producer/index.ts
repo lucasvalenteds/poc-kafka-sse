@@ -29,32 +29,28 @@ async function wait(timeInMs: number): Promise<void> {
 }
 
 async function main() {
-  try {
-    const [broker, topic] = [
-      process.env.KAFKA_BROKER_URL!,
-      process.env.KAFKA_TOPIC_NAME!,
-    ];
+  const [broker, topic] = [
+    process.env.KAFKA_BROKER_URL!,
+    process.env.KAFKA_TOPIC_NAME!,
+  ];
 
-    const kafka = new Kafka({
-      brokers: [broker],
+  const kafka = new Kafka({
+    brokers: [broker],
+  });
+
+  const producer = kafka.producer();
+
+  await producer.connect();
+
+  for await (const message of createMessage()) {
+    const metadata = await producer.send({
+      topic,
+      messages: [{ value: JSON.stringify(message) }],
     });
 
-    const producer = kafka.producer();
-
-    await producer.connect();
-
-    for await (const message of createMessage()) {
-      const metadata = await producer.send({
-        topic,
-        messages: [{ value: JSON.stringify(message) }],
-      });
-
-      console.debug("%s: Message sent", new Date(), { message, metadata });
-      await wait(1000);
-    }
-  } catch (error) {
-    console.error(error);
+    console.debug("%s: Message sent", new Date(), { message, metadata });
+    await wait(1000);
   }
 }
 
-main();
+main().catch(console.error);
