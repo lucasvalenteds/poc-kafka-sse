@@ -51,9 +51,9 @@ class GenericConsumer {
 }
 
 async function createHttpHandler(
-  service: GenericConsumer
+  consumer: GenericConsumer
 ): Promise<HTTP.RequestListener> {
-  await service.start();
+  await consumer.start();
 
   return async function (request, response) {
     response.writeHead(200, {
@@ -62,7 +62,7 @@ async function createHttpHandler(
       Connection: "keep-alive",
     });
 
-    await service.onMessage<Message>((message) => {
+    await consumer.onMessage<Message>((message) => {
       const event = createSseEvent(message);
       response.write(`id: ${event.id}\n`);
       response.write(`event: ${event.event}\n`);
@@ -70,7 +70,7 @@ async function createHttpHandler(
     });
 
     request.on("close", async () => {
-      await service.stop();
+      await consumer.stop();
       response.end();
     });
   };
