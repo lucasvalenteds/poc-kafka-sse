@@ -42,9 +42,7 @@ class GenericConsumer {
   public async onMessage<T>(fn: (message: T) => void): Promise<void> {
     await this.consumer.run({
       eachMessage: async (payload: EachMessagePayload) => {
-        const message: T = JSON.parse(payload.message.value.toString("utf-8"));
-
-        fn(message);
+        fn(JSON.parse(payload.message.value.toString("utf-8")));
       },
     });
   }
@@ -56,6 +54,11 @@ async function createHttpHandler(
   await consumer.start();
 
   return async function (request, response) {
+    request.on("close", () => {
+      void consumer.stop();
+      response.end();
+    });
+
     response.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
@@ -67,11 +70,6 @@ async function createHttpHandler(
       response.write(`id: ${event.id}\n`);
       response.write(`event: ${event.event}\n`);
       response.write(`data: ${event.data}\n\n`);
-    });
-
-    request.on("close", async () => {
-      await consumer.stop();
-      response.end();
     });
   };
 }
