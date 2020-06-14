@@ -50,10 +50,11 @@ export const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   React.useEffect(() => {
-    const service = new MessageService('http://localhost:8082');
+    const service = new MessageService(process.env.REACT_APP_CONSUMER_URL!);
 
     service.listen<Message>('new-message', (message) => {
-      setMessages((previous: Message[]) => [...previous, message]);
+      console.debug('%s: New message received', new Date(), { message });
+      setMessages((previous: Message[]) => [message, ...previous]);
     });
 
     return () => service.disconnect('new-message');
@@ -64,8 +65,8 @@ export const App: React.FC = () => {
       <div>
         <h1>Messages</h1>
         <ul>
-          {messages.map((message) => (
-            <MessageListItem message={message} />
+          {messages.map((message, index) => (
+            <MessageListItem key={message.id + index} message={message} />
           ))}
         </ul>
       </div>
