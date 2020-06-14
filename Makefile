@@ -12,19 +12,15 @@ infra-down:
 infra-logs:
 	@docker-compose logs --follow
 
-install:
-	@npm --prefix ./producer install
-	@npm --prefix ./consumer install
-	@npm --prefix ./client install
-
 run-producer:
-	@KAFKA_BROKER_URL=$(KAFKA_BROKER_URL) KAFKA_TOPIC_NAME=$(KAFKA_TOPIC_NAME) \
-			npm --prefix ./producer start
+	@cd producer && ./gradlew run
 
 run-consumer:
+	@npm --prefix ./consumer install
 	@PORT=$(CONSUMER_PORT) KAFKA_BROKER_URL=$(KAFKA_BROKER_URL) KAFKA_TOPIC_NAME=$(KAFKA_TOPIC_NAME) \
 			npm --prefix ./consumer start
 
 run-client:
+	@npm --prefix ./client install
 	@REACT_APP_CONSUMER_URL=http://localhost:$(CONSUMER_PORT) \
 			npm --prefix ./client start

@@ -4,7 +4,7 @@ It demonstrates how to produce and consume [Kafka](https://github.com/apache/kaf
 
 We want to have an application based on streams of events managed by Kafka. To achieve that goal we have three participants.
 
-The `producer` is a Node.js script that sends random messages to a Kafka topic.
+The `producer` is a Java program that sends random messages to a Kafka topic.
 
 The `consumer` is a Node.js server that reads messages from the topic when HTTP requests are made and streams those messages back (SSE).
 
@@ -24,7 +24,6 @@ The `client` is a React application that communicates to the consumer that it wa
 
 | Description | Command |
 | :--- | :--- |
-| Install dependencies | `make install` |
 | Run producer | `make run-producer` |
 | Run consumer | `make run-consumer` |
 | Run client | `make run-client` |
