@@ -63,7 +63,7 @@ export const App: React.FC = () => {
   return (
     <>
       <div>
-        <h1>Messages</h1>
+        <h1>{messages.length} Messages</h1>
         <ul>
           {messages.map((message, index) => (
             <MessageListItem key={message.id + index} message={message} />
