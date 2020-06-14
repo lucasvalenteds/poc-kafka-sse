@@ -22,3 +22,7 @@ We want to have a producer sending messages to a topic to be read by a consumer 
 | Run producer | `make run-producer` |
 | Run consumer | `make run-consumer` |
 | Run client | `make run-client` |
+
+## Preview
+
+![](./preview/01.gif)
