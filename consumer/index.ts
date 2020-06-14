@@ -48,12 +48,10 @@ class GenericConsumer {
   }
 }
 
-async function createHttpHandler(
-  consumer: GenericConsumer
-): Promise<HTTP.RequestListener> {
-  await consumer.start();
-
+function createHttpHandler(consumer: GenericConsumer): HTTP.RequestListener {
   return async function (request, response) {
+    await consumer.start();
+
     request.on("close", () => {
       void consumer.stop();
       response.end();
@@ -83,9 +81,9 @@ async function main() {
     brokers: [broker],
   });
 
-  const server = HTTP.createServer(
-    await createHttpHandler(new GenericConsumer(topic, kafka))
-  );
+  const consumer = new GenericConsumer(topic, kafka);
+
+  const server = HTTP.createServer(createHttpHandler(consumer));
 
   server
     .listen(port)
