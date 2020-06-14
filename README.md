@@ -2,7 +2,13 @@
 
 It demonstrates how to produce and consume [Kafka](https://github.com/apache/kafka) events and expose them using [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE).
 
-We want to have a producer sending messages to a topic to be read by a consumer and then expose them to a Web application.
+We want to have an application based on streams of events managed by Kafka. To achieve that goal we have three participants.
+
+The `producer` is a Node.js script that sends random messages to a Kafka topic.
+
+The `consumer` is a Node.js server that reads messages from the topic when HTTP requests are made and streams those messages back (SSE).
+
+The `client` is a React application that communicates to the consumer that it wants the messages and renders each of it on the screen.
 
 ## How to run
 
