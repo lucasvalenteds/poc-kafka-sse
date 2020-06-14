@@ -27,7 +27,7 @@ class GenericConsumer {
   private consumer: Consumer;
 
   public constructor(private topic: string, kafka: Kafka) {
-    this.consumer = kafka.consumer({ groupId: topic });
+    this.consumer = kafka.consumer({ groupId: UUID() });
   }
 
   public async start(): Promise<void> {
@@ -42,7 +42,12 @@ class GenericConsumer {
   public async onMessage<T>(fn: (message: T) => void): Promise<void> {
     await this.consumer.run({
       eachMessage: async (payload: EachMessagePayload) => {
-        fn(JSON.parse(payload.message.value.toString("utf-8")));
+        try {
+          const message = JSON.parse(payload.message.value.toString("utf-8"));
+          fn(message);
+        } catch (error) {
+          console.error("onMessage:", error);
+        }
       },
     });
   }
@@ -58,12 +63,17 @@ function createHttpHandler(consumer: GenericConsumer): HTTP.RequestListener {
     });
 
     response.writeHead(200, {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Request-Method": "*",
+      "Access-Control-Allow-Methods": "OPTIONS, GET",
+      "Access-Control-Allow-Headers": "*",
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
       Connection: "keep-alive",
     });
 
     await consumer.onMessage<Message>((message) => {
+      console.debug("%s: onMessage triggered", new Date(), { message });
       const event = createSseEvent(message);
       response.write(`id: ${event.id}\n`);
       response.write(`event: ${event.event}\n`);
