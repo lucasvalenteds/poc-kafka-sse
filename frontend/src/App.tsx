@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export type Message = {
   id: string;
@@ -47,7 +47,7 @@ export const MessageListItem: React.FC<MessageListItemProps> = (props) => {
 };
 
 export const App: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = React.useState<Message[]>([]);
 
   React.useEffect(() => {
     const service = new MessageService(process.env.REACT_APP_CONSUMER_URL!);
